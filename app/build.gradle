@@ -8,6 +8,7 @@ plugins {
 Properties properties = new Properties()
 properties.load(new FileInputStream(rootProject.file("local.properties")))
 def naverMapClientId = properties.getProperty("naver.map.client.id")
+def vaccinationCenterApiKey = properties.getProperty("vaccination.center.api.key")
 
 android {
     compileSdk 32
@@ -22,6 +23,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "NAVER_MAP_CLIENT_ID", naverMapClientId)
+        buildConfigField("String", "VACCINATION_CENTER_API_KEY", vaccinationCenterApiKey)
     }
 
     buildTypes {
