@@ -14,9 +14,14 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            (1..10).forEach { page ->
-                repository.getCenterList(page)
-            }
+            loadAndSave()
+        }
+    }
+
+    private suspend fun loadAndSave() {
+        (1..10).forEach { page ->
+            val result = repository.getCenterList(page)
+            repository.saveCenterList(result)
         }
     }
 }
