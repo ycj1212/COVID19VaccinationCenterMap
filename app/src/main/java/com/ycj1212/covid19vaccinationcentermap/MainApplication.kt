@@ -2,7 +2,9 @@ package com.ycj1212.covid19vaccinationcentermap
 
 import android.app.Application
 import com.naver.maps.map.NaverMapSdk
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
