@@ -1,9 +1,19 @@
 package com.ycj1212.covid19vaccinationcentermap
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ycj1212.covid19vaccinationcentermap.data.CenterRepository
+import kotlinx.coroutines.launch
 
-class SplashViewModel : ViewModel() {
+class SplashViewModel (
+    private val repository: CenterRepository
+) : ViewModel() {
+
     init {
-        TODO("API 데이터 로드 후 데이터베이스에 저장")
+        viewModelScope.launch {
+            (1..10).forEach { page ->
+                repository.getCenterList(page)
+            }
+        }
     }
 }
