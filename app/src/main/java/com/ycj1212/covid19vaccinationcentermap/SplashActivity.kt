@@ -1,5 +1,6 @@
 package com.ycj1212.covid19vaccinationcentermap
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -20,8 +21,14 @@ class SplashActivity : AppCompatActivity() {
 
         splashViewModel.isProgressDone.observe(this) { isProgressDone ->
             if (isProgressDone) {
-                TODO("Map 화면으로 이동")
+                navigateToMapUi()
             }
         }
+    }
+
+    private fun navigateToMapUi() {
+        val intent = Intent(this, MapActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
