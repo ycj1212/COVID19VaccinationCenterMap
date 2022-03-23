@@ -5,6 +5,7 @@ buildscript {
         lifecycle_version = "2.5.0-alpha04"
         room_version = "2.4.2"
         retrofit_version = "2.9.0"
+        okhttp_version = "4.9.3"
         naver_map_sdk_version = "3.14.0"
     }
 
