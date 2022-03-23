@@ -1,5 +1,7 @@
 package com.ycj1212.covid19vaccinationcentermap.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class CenterResponse(
@@ -17,7 +19,9 @@ data class CenterResponse(
     val totalCount: Int
 )
 
+@Entity
 data class Center(
+    @PrimaryKey
     @SerializedName("id")
     val id: Int,
     @SerializedName("address")
