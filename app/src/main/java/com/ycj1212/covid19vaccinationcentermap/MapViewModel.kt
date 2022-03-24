@@ -19,7 +19,7 @@ class MapViewModel @Inject constructor(
     private val _centerList = MutableLiveData<List<Center>>()
     val centerList: LiveData<List<Center>> = _centerList
 
-    init {
+    fun getCenters() {
         viewModelScope.launch(Dispatchers.IO) {
             val centers = repository.getCenters()
 
