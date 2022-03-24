@@ -5,6 +5,5 @@ import androidx.databinding.BindingAdapter
 
 @BindingAdapter("app:progressTo")
 fun progressTo(progressBar: ProgressBar, progress: Int) {
-    println(progress)
     progressBar.progress = progress
 }
