@@ -21,8 +21,8 @@ class SplashViewModel @Inject constructor(
     val isProgressDone: LiveData<Boolean> = _isProgressDone
 
     init {
-        viewModelScope.launch {
-            val loadAndSaveJob = launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val loadAndSaveJob = launch {
                 loadAndSave()
             }
 
