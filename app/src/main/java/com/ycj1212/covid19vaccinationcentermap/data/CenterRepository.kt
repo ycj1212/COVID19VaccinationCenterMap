@@ -17,6 +17,8 @@ class CenterRepository @Inject constructor(
         centerDao.insert(centerList)
     }
 
+    fun getCenters(): List<Center> = centerDao.getCenters()
+
     companion object {
         const val FIRST_PAGE = 1
         const val LAST_PAGE = 10
