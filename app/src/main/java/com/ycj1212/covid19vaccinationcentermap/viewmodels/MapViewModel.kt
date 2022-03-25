@@ -24,6 +24,11 @@ class MapViewModel @Inject constructor(
     private val _isVisibleWindow = MutableStateFlow(false)
     val isVisibleWindow: StateFlow<Boolean> = _isVisibleWindow
 
+    /**
+     * 마커를 클릭한 경우 정보안내창의 가시성을 처리합니다.
+     *
+     * @param id 클릭한 마커에 해당하는 예방접종센터 id
+     */
     fun clickMarker(id: Int) {
         if (selectedMarkerInfo.value?.id == id && isVisibleWindow.value) {
             hideInfoWindow()
@@ -32,6 +37,12 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 정보안내창을 보이도록 처리합니다.
+     * 마커를 클릭한 경우 호출됩니다.
+     *
+     * @param id 클릭한 마커에 해당하는 예방접종센터 id
+     */
     private fun showInfoWindow(id: Int) {
         viewModelScope.launch {
             repository.getCenter(id).collect { center ->
@@ -48,6 +59,10 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 정보안내창을 숨깁니다.
+     * 선택한 마커를 재선택하는 경우, 마커가 아닌 지도를 클릭한 경우, 정보안내창이 보이고 있을 때 뒤로가기 버튼을 클릭한 경우에 호출됩니다.
+     */
     fun hideInfoWindow() {
         _isVisibleWindow.value = false
     }

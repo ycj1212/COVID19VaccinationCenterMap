@@ -32,6 +32,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
+        // 권한 요청을 수락한 경우
         if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
             permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         ) {
@@ -46,7 +47,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 CameraUpdate.scrollAndZoomTo(LatLng(location), 15.0)
                     .animate(CameraAnimation.Linear)
             )
-        } else {
+        }
+        // 권한 요청을 거절한 경우
+        else {
             Toast.makeText(this, "현재 위치를 확인하려면 권한 수락이 필요합니다.", Toast.LENGTH_LONG).show()
         }
     }
@@ -67,21 +70,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(p0: NaverMap) {
         naverMap = p0
+
+        // 마커가 아닌 지도를 클릭한 경우 정보안내창을 숨깁니다.
         naverMap.setOnMapClickListener { _, _ ->
             mapViewModel.hideInfoWindow()
         }
 
+        // 내 위치 버튼을 클릭한 경우 현재 내 위치로 이동합니다.
         binding.btnMyLocation.setOnClickListener {
             requestCurrentLocation()
         }
 
         lifecycleScope.launch {
+            // DB에서 예방접종센터 목록을 읽어 각 센터에 해당하는 마커를 생성합니다.
             mapViewModel.centerList.collect { centerList ->
                 centerList.forEach { center ->
                     Marker().apply {
                         position = LatLng(center.lat.toDouble(), center.lng.toDouble())
                         captionText = center.centerName
                         map = naverMap
+                        // 만약 센터 유형이 "지역"인 경우 초록색, "중앙/권역"인 경우 빨간색으로 마커 색상을 설정합니다.
                         icon = if (center.centerType == "지역") MarkerIcons.GREEN else MarkerIcons.RED
                         setOnClickListener {
                             mapViewModel.clickMarker(center.id)
@@ -98,6 +106,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * 이 함수는 위치 권한을 요청하는 [locationPermissionRequest]를 수행합니다.
+     * 내 위치 버튼을 클릭한 경우에만 호출됩니다.
+     */
     private fun requestCurrentLocation() {
         locationPermissionRequest.launch(
             arrayOf(
@@ -107,6 +119,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    /**
+     * 뒤로가기 버튼을 클릭했을 때 정보안내창이 보이는 경우 정보안내창을 숨깁니다.
+     */
     override fun onBackPressed() {
         if (mapViewModel.isVisibleWindow.value) {
             mapViewModel.hideInfoWindow()

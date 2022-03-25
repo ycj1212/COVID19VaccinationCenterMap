@@ -8,6 +8,9 @@ class CenterRepository @Inject constructor(
     private val service: VaccinationCenterLocationInfoService,
     private val centerDao: CenterDao
 ) {
+    /**
+     * API를 통해 1페이지(page)에 10개(perPage)씩 순서대로 10개 페이지 호출(총 100개)하고 데이터베이스에 저장합니다.
+     */
     suspend fun loadAndSaveCenters() {
         (FIRST_PAGE..LAST_PAGE).forEach { page ->
             flow {

@@ -40,6 +40,8 @@ class SplashActivity : AppCompatActivity() {
 
     /**
      * 네트워크 연결 상태에 따라 진행 여부를 결정합니다.
+     * 네트워크에 연결되어 있는 경우 API 데이터를 호출합니다.
+     * 연결되어 있지 않은 경우 토스트 메시지와 함께 앱을 종료합니다.
      */
     private fun handleNetworkState() {
         val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
