@@ -8,9 +8,12 @@ import androidx.room.Query
 @Dao
 interface CenterDao {
 
+    @Query("SELECT * FROM center WHERE id = :id")
+    suspend fun getCenter(id: Int): Center
+
     @Query("SELECT * FROM center")
-    fun getCenters(): List<Center>
+    suspend fun getCenters(): List<Center>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(centers: List<Center>)
+    suspend fun insert(centers: List<Center>)
 }

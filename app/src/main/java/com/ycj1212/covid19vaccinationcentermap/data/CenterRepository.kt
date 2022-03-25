@@ -13,11 +13,13 @@ class CenterRepository @Inject constructor(
         return response.data
     }
 
-    fun saveCenterList(centerList: List<Center>) {
+    suspend fun saveCenterList(centerList: List<Center>) {
         centerDao.insert(centerList)
     }
 
-    fun getCenters(): List<Center> = centerDao.getCenters()
+    suspend fun getCenters(): List<Center> = centerDao.getCenters()
+
+    suspend fun getCenter(id: Int): Center = centerDao.getCenter(id)
 
     companion object {
         const val FIRST_PAGE = 1

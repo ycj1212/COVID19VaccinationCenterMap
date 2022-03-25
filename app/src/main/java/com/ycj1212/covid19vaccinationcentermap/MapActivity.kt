@@ -1,14 +1,19 @@
 package com.ycj1212.covid19vaccinationcentermap
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.LocationManager
 import android.os.Bundle
+import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.MapFragment
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.util.MarkerIcons
 import com.ycj1212.covid19vaccinationcentermap.databinding.ActivityMapBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapBinding
     private lateinit var naverMap: NaverMap
+
     private val mapViewModel: MapViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,17 +29,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_map)
         binding.lifecycleOwner = this
 
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as? MapFragment
+        (supportFragmentManager.findFragmentById(R.id.map_fragment) as? MapFragment
             ?: MapFragment.newInstance().also {
                 supportFragmentManager.beginTransaction().add(R.id.map_fragment, it).commit()
-            }
-        mapFragment.getMapAsync(this)
+            }).getMapAsync(this)
     }
 
     override fun onMapReady(p0: NaverMap) {
         naverMap = p0
         naverMap.setOnMapClickListener { _, _ ->
-//            TODO("선택된 마커 없음으로 처리")
+            mapViewModel.hideInfoWindow()
         }
 
         mapViewModel.getCenters()
@@ -43,15 +48,30 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     position = LatLng(center.lat.toDouble(), center.lng.toDouble())
                     captionText = center.centerName
                     map = naverMap
+                    icon = if (center.centerType == "지역") MarkerIcons.GREEN else MarkerIcons.RED
                     setOnClickListener {
-//                        TODO("화면 중앙으로 카메라 이동")
-//                        TODO("정보 안내창에 표시")
-//                        TODO("선택 상태 반영")
+                        mapViewModel.clickMarker(center.id)
+                        naverMap.setContentPadding(0, 0, 0, binding.infoWindow.height)
+                        naverMap.moveCamera(
+                            CameraUpdate.scrollAndZoomTo(position, 15.0)
+                                .animate(CameraAnimation.Linear)
+                        )
                         true
                     }
-//                    TODO("centerType에 따라 마커 색상 구분")
                 }
             }
+        }
+
+        mapViewModel.selectedMarkerInfo.observe(this) { infoWindowUiState ->
+            binding.tvCenterName.text = infoWindowUiState.centerName
+            binding.tvFacilityName.text = infoWindowUiState.facilityName
+            binding.tvAddress.text = infoWindowUiState.address
+            binding.tvPhoneNumber.text = infoWindowUiState.phoneNumber
+            binding.tvUpdatedAt.text = infoWindowUiState.updatedAt
+        }
+
+        mapViewModel.isVisibleWindow.observe(this) { isVisible ->
+            binding.infoWindow.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
     }
 }
