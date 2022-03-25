@@ -21,13 +21,37 @@ import dagger.hilt.android.AndroidEntryPoint
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapBinding
     private lateinit var naverMap: NaverMap
+    private lateinit var locationManager: LocationManager
 
     private val mapViewModel: MapViewModel by viewModels()
+
+    @SuppressLint("MissingPermission")
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
+            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+
+            if (location == null) {
+                requestCurrentLocation()
+                return@registerForActivityResult
+            }
+
+            naverMap.moveCamera(
+                CameraUpdate.scrollAndZoomTo(LatLng(location), 15.0)
+                    .animate(CameraAnimation.Linear)
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_map)
         binding.lifecycleOwner = this
+
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         (supportFragmentManager.findFragmentById(R.id.map_fragment) as? MapFragment
             ?: MapFragment.newInstance().also {
@@ -39,6 +63,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         naverMap = p0
         naverMap.setOnMapClickListener { _, _ ->
             mapViewModel.hideInfoWindow()
+        }
+
+        binding.btnMyLocation.setOnClickListener {
+            requestCurrentLocation()
         }
 
         mapViewModel.getCenters()
@@ -73,5 +101,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapViewModel.isVisibleWindow.observe(this) { isVisible ->
             binding.infoWindow.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
+    }
+
+    private fun requestCurrentLocation() {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 }
