@@ -1,7 +1,12 @@
 package com.ycj1212.covid19vaccinationcentermap
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -21,11 +26,51 @@ class SplashActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewmodel = splashViewModel
 
+        handleNetworkState()
+
         lifecycleScope.launch {
             splashViewModel.isProgressDone.collect() { isProgressDone ->
                 if (isProgressDone) {
                     navigateToMapUi()
                 }
+            }
+        }
+    }
+
+    /**
+     * 네트워크 연결 상태에 따라 진행 여부를 결정합니다.
+     */
+    private fun handleNetworkState() {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (cm.activeNetwork == null) {
+                Toast.makeText(this, "네트워크 연결 상태를 확인해주세요.", Toast.LENGTH_LONG).show()
+                finish()
+            }
+            cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    splashViewModel.start()
+                }
+
+                override fun onLost(network: Network) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@SplashActivity,
+                            "네트워크 연결 상태를 확인해주세요.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    finish()
+                }
+            })
+        } else {
+            val activeNetwork = cm.activeNetworkInfo
+            val isConnected = activeNetwork?.isConnectedOrConnecting == true
+            if (!isConnected) {
+                Toast.makeText(this, "네트워크 연결 상태를 확인해주세요.", Toast.LENGTH_LONG).show()
+                finish()
+            } else {
+                splashViewModel.start()
             }
         }
     }

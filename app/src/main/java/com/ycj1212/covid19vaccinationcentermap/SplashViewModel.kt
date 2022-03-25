@@ -22,7 +22,7 @@ class SplashViewModel @Inject constructor(
     private val _isProgressDone = MutableStateFlow(false)
     val isProgressDone: StateFlow<Boolean> = _isProgressDone
 
-    init {
+    fun start() {
         viewModelScope.launch(Dispatchers.IO) {
             val loadAndSaveJob = launch {
                 repository.loadAndSaveCenters()
