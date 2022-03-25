@@ -16,6 +16,7 @@ import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.MarkerIcons
 import com.ycj1212.covid19vaccinationcentermap.databinding.ActivityMapBinding
+import com.ycj1212.covid19vaccinationcentermap.viewmodels.MapViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

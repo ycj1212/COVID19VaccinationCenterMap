@@ -1,4 +1,4 @@
-package com.ycj1212.covid19vaccinationcentermap
+package com.ycj1212.covid19vaccinationcentermap.viewmodels
 
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel

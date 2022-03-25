@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.ycj1212.covid19vaccinationcentermap.databinding.ActivitySplashBinding
+import com.ycj1212.covid19vaccinationcentermap.viewmodels.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

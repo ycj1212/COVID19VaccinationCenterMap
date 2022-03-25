@@ -1,4 +1,4 @@
-package com.ycj1212.covid19vaccinationcentermap
+package com.ycj1212.covid19vaccinationcentermap.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
