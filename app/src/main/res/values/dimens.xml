@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="info_window_height">180dp</dimen>
+    <dimen name="info_window_margin">10dp</dimen>
+    <dimen name="btn_my_location_margin">10dp</dimen>
+</resources>

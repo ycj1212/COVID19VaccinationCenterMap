@@ -3,6 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewmodel"
+            type="com.ycj1212.covid19vaccinationcentermap.MapViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -20,12 +29,13 @@
         <LinearLayout
             android:id="@+id/info_window"
             android:layout_width="0dp"
-            android:layout_height="180dp"
-            android:layout_margin="10dp"
+            android:layout_height="@dimen/info_window_height"
+            android:layout_margin="@dimen/info_window_margin"
             android:background="@color/white"
             android:orientation="vertical"
             android:padding="10dp"
-            android:visibility="gone"
+            android:elevation="5dp"
+            android:visibility="@{viewmodel.isVisibleWindow ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -34,6 +44,7 @@
                 android:id="@+id/tv_center_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{viewmodel.selectedMarkerInfo.centerName}"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 tools:text="코로나19 경기도 고양시 일산동구 예방접종센터" />
@@ -42,6 +53,7 @@
                 android:id="@+id/tv_facility_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{viewmodel.selectedMarkerInfo.facilityName}"
                 android:textSize="20sp"
                 tools:text="탄천종합운동장 체육회관 이벤트홀" />
 
@@ -49,28 +61,31 @@
                 android:id="@+id/tv_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{viewmodel.selectedMarkerInfo.address}"
                 tools:text="충청남도 천안시 동남구 천안대로 357" />
 
             <TextView
                 android:id="@+id/tv_phone_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{viewmodel.selectedMarkerInfo.phoneNumber}"
                 tools:text="062-220-3739" />
 
             <TextView
                 android:id="@+id/tv_updated_at"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{viewmodel.selectedMarkerInfo.updatedAt}"
                 tools:text="2021-07-16 04:55:08" />
 
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_my_location"
+            layoutMarginBottom="@{viewmodel.isVisibleWindow ? @dimen/info_window_height + @dimen/info_window_margin + @dimen/btn_my_location_margin : @dimen/btn_my_location_margin}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
             android:backgroundTint="@color/white"
             android:src="@drawable/ic_baseline_my_location_24"
             app:borderWidth="0dp"
