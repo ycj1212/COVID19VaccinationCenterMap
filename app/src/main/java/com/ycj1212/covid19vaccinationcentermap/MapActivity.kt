@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.LocationManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -45,7 +46,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     .animate(CameraAnimation.Linear)
             )
         } else {
-
+            Toast.makeText(this, "현재 위치를 확인하려면 권한 수락이 필요합니다.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -106,6 +107,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        if (mapViewModel.isVisibleWindow.value) {
+            mapViewModel.hideInfoWindow()
+        } else {
+            super.onBackPressed()
+        }
     }
 }
