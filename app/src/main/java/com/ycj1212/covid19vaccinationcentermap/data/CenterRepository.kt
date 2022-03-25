@@ -1,25 +1,28 @@
 package com.ycj1212.covid19vaccinationcentermap.data
 
 import com.ycj1212.covid19vaccinationcentermap.api.VaccinationCenterLocationInfoService
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class CenterRepository @Inject constructor(
     private val service: VaccinationCenterLocationInfoService,
     private val centerDao: CenterDao
 ) {
-    suspend fun getCenterList(page: Int): List<Center> {
-        if (page !in FIRST_PAGE..LAST_PAGE) return emptyList()
-        val response = service.getCenterList(page)
-        return response.data
+    suspend fun loadAndSaveCenters() {
+        (FIRST_PAGE..LAST_PAGE).forEach { page ->
+            flow {
+                emit(service.getCenterList(page).data)
+            }.catch {
+                emit(emptyList())
+            }.collect { centerList ->
+                centerDao.insert(centerList)
+            }
+        }
     }
 
-    suspend fun saveCenterList(centerList: List<Center>) {
-        centerDao.insert(centerList)
-    }
+    fun getCenters(): Flow<List<Center>> = centerDao.getCenters()
 
-    suspend fun getCenters(): List<Center> = centerDao.getCenters()
-
-    suspend fun getCenter(id: Int): Center = centerDao.getCenter(id)
+    fun getCenter(id: Int): Flow<Center> = centerDao.getCenter(id)
 
     companion object {
         const val FIRST_PAGE = 1

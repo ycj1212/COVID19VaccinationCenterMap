@@ -5,8 +5,10 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.ycj1212.covid19vaccinationcentermap.databinding.ActivitySplashBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
@@ -16,12 +18,14 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
-        binding.viewmodel = splashViewModel
         binding.lifecycleOwner = this
+        binding.viewmodel = splashViewModel
 
-        splashViewModel.isProgressDone.observe(this) { isProgressDone ->
-            if (isProgressDone) {
-                navigateToMapUi()
+        lifecycleScope.launch {
+            splashViewModel.isProgressDone.collect() { isProgressDone ->
+                if (isProgressDone) {
+                    navigateToMapUi()
+                }
             }
         }
     }

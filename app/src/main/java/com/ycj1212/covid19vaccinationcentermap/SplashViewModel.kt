@@ -1,39 +1,34 @@
 package com.ycj1212.covid19vaccinationcentermap
 
 import android.os.SystemClock
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ycj1212.covid19vaccinationcentermap.data.CenterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val repository: CenterRepository
 ) : ViewModel() {
-    private val _progress = MutableLiveData(0)
-    val progress: LiveData<Int> = _progress
+    private val _progress = MutableStateFlow(0)
+    val progress: StateFlow<Int> = _progress
 
-    private val _isProgressDone = MutableLiveData(false)
-    val isProgressDone: LiveData<Boolean> = _isProgressDone
+    private val _isProgressDone = MutableStateFlow(false)
+    val isProgressDone: StateFlow<Boolean> = _isProgressDone
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             val loadAndSaveJob = launch {
-                loadAndSave()
+                repository.loadAndSaveCenters()
             }
 
             process1(loadAndSaveJob)
-        }
-    }
-
-    private suspend fun loadAndSave() {
-        (1..10).forEach { page ->
-            val result = repository.getCenterList(page)
-            repository.saveCenterList(result)
         }
     }
 
@@ -60,31 +55,25 @@ class SplashViewModel @Inject constructor(
                 break
             }
 
-            withContext(Dispatchers.Main) {
-                _progress.value = currProgress
-            }
+            _progress.value = currProgress
 
             currTime = SystemClock.elapsedRealtime()
         }
 
-        withContext(Dispatchers.Main) {
-            _isProgressDone.value = true
-        }
+        _isProgressDone.value = true
     }
 
     /**
      * 0.7초에 걸쳐 [_progress] 값(80~100)을 차례대로 변경한다.
      */
-    private suspend fun process2() {
+    private fun process2() {
         val startTime = SystemClock.elapsedRealtime()
         var currTime = SystemClock.elapsedRealtime()
 
         while (currTime < startTime + 700) {
             val currProgress2 = ((currTime - startTime).toDouble() / 3.5 + 1).toInt()
 
-            withContext(Dispatchers.Main) {
-                _progress.value = 80 + currProgress2
-            }
+            _progress.value = 80 + currProgress2
 
             currTime = SystemClock.elapsedRealtime()
         }

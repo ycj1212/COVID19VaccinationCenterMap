@@ -4,15 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CenterDao {
 
     @Query("SELECT * FROM center WHERE id = :id")
-    suspend fun getCenter(id: Int): Center
+    fun getCenter(id: Int): Flow<Center>
 
     @Query("SELECT * FROM center")
-    suspend fun getCenters(): List<Center>
+    fun getCenters(): Flow<List<Center>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(centers: List<Center>)

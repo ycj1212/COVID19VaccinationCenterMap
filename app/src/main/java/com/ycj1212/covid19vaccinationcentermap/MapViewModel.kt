@@ -1,43 +1,31 @@
 package com.ycj1212.covid19vaccinationcentermap
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ycj1212.covid19vaccinationcentermap.data.Center
 import com.ycj1212.covid19vaccinationcentermap.data.CenterRepository
 import com.ycj1212.covid19vaccinationcentermap.data.InfoWindowUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val repository: CenterRepository
 ) : ViewModel() {
-    private val _centerList = MutableLiveData<List<Center>>()
-    val centerList: LiveData<List<Center>> = _centerList
+    val centerList: Flow<List<Center>> = repository.getCenters()
 
-    private val _selectedMarkerInfo = MutableLiveData<InfoWindowUiState>()
-    val selectedMarkerInfo: LiveData<InfoWindowUiState> = _selectedMarkerInfo
+    private val _selectedMarkerInfo = MutableStateFlow<InfoWindowUiState?>(null)
+    val selectedMarkerInfo: StateFlow<InfoWindowUiState?> = _selectedMarkerInfo
 
-    private val _isVisibleWindow = MutableLiveData<Boolean>()
-    val isVisibleWindow: LiveData<Boolean> = _isVisibleWindow
-
-    fun getCenters() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val centers = repository.getCenters()
-
-            withContext(Dispatchers.Main) {
-                _centerList.value = centers
-            }
-        }
-    }
+    private val _isVisibleWindow = MutableStateFlow(false)
+    val isVisibleWindow: StateFlow<Boolean> = _isVisibleWindow
 
     fun clickMarker(id: Int) {
-        if (selectedMarkerInfo.value?.id == id && isVisibleWindow.value == true) {
+        if (selectedMarkerInfo.value?.id == id && isVisibleWindow.value) {
             hideInfoWindow()
         } else {
             showInfoWindow(id)
@@ -45,10 +33,8 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showInfoWindow(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val center = repository.getCenter(id)
-
-            withContext(Dispatchers.Main) {
+        viewModelScope.launch {
+            repository.getCenter(id).collect { center ->
                 _isVisibleWindow.value = true
                 _selectedMarkerInfo.value = InfoWindowUiState(
                     id = center.id,
